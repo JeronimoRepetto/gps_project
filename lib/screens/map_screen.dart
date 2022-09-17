@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:gps_project/blocs/blocs.dart';
-import 'package:gps_project/widgets/btn_follow_user.dart';
-import 'package:gps_project/widgets/btn_show_polyline.dart';
 import 'package:gps_project/widgets/widgets.dart';
 
 import '../views/views.dart';
@@ -55,6 +53,7 @@ class _MapScreenState extends State<MapScreen> {
                       initialLocation: locationState.lastKnowLocation!,
                       polylines: polylines.values.toSet(),
                     ),
+                    const SearchBar(),
                   ],
                 ),
               );
