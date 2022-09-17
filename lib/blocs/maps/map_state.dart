@@ -2,19 +2,40 @@ part of 'map_bloc.dart';
 
 class MapState extends Equatable {
   final bool isMapInitialized;
-  final bool followUser;
+  final bool isFollowingUser;
+  final bool showMyRute;
 
-  const MapState({this.isMapInitialized = false, this.followUser = false});
+  final Map<String, Polyline> polylines;
 
-  @override
-  List<Object> get props => [isMapInitialized, followUser];
+/*
+  mi_ruta : {
+    id: polyliuneID by Google
+    points : [[Lat,Lng], [12314124,-1231231], [123213,-1231321], ...]
+    width: 3
+    color: black[87]
+  }
+*/
+
+  const MapState({
+    this.isMapInitialized = false,
+    this.isFollowingUser = true,
+    this.showMyRute = true,
+    Map<String, Polyline>? polylines,
+  }) : polylines = polylines ?? const {};
 
   MapState CopyWith({
     bool? isMapInitialized,
-    bool? followUser,
+    bool? isFollowingUser,
+    bool? showMyRute,
+    Map<String, Polyline>? polylines,
   }) =>
       MapState(
-        isMapInitialized: isMapInitialized ?? this.isMapInitialized,
-        followUser: followUser ?? this.followUser,
-      );
+          isMapInitialized: isMapInitialized ?? this.isMapInitialized,
+          isFollowingUser: isFollowingUser ?? this.isFollowingUser,
+          showMyRute: showMyRute ?? this.showMyRute,
+          polylines: polylines ?? this.polylines);
+
+  @override
+  List<Object> get props =>
+      [isMapInitialized, isFollowingUser, showMyRute, polylines];
 }
