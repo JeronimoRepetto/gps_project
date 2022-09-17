@@ -23,7 +23,7 @@ class _EnableGpsMessage extends StatelessWidget {
   Widget build(BuildContext context) {
     return const Center(
       child: Text(
-        'Debe habilitar el GPS',
+        'You have to enable GPS',
         style: TextStyle(fontSize: 25, fontWeight: FontWeight.w400),
       ),
     );
@@ -38,7 +38,7 @@ class _AccessButton extends StatelessWidget {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        const Center(child: Text("Es Necesario el acceso al GPS")),
+        const Center(child: Text("We need access to GPS")),
         MaterialButton(
           onPressed: () {
             final gpsBloc = BlocProvider.of<GpsBloc>(context);
@@ -49,7 +49,7 @@ class _AccessButton extends StatelessWidget {
           splashColor: Colors.transparent,
           color: Colors.black,
           child: const Text(
-            "Solicitar Acceso",
+            "Request Access",
             style: TextStyle(color: Colors.white),
           ),
         )

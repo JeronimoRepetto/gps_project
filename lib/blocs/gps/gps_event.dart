@@ -5,7 +5,6 @@ abstract class GpsEvent extends Equatable {
   const GpsEvent();
 
   @override
-  // TODO: implement props
   List<Object?> get props => [];
 }
 
