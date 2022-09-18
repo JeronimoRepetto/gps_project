@@ -24,16 +24,31 @@ class TrafficService {
     return data;
   }
 
-  Future<List<Feature>> getResultByQuery(LatLng proximity, String query, String country, String language) async {
+  Future<List<Feature>> getResultByQuery(
+      LatLng proximity, String query, String country, String language) async {
     if (query.isEmpty) return [];
     final url = "$_basePlacesUrl/$query.json";
 
-    final response = await _dioPlaces.get(url,queryParameters: {
-      "proximity" : "${proximity.longitude},${proximity.latitude}",
-      "country" : country,
-      "language" : language
+    final response = await _dioPlaces.get(url, queryParameters: {
+      "limit": 7,
+      "proximity": "${proximity.longitude},${proximity.latitude}",
+      "country": country,
+      "language": language
     });
     final PlacesResponse placesResponse = PlacesResponse.fromMap(response.data);
     return placesResponse.features;
+  }
+
+  Future<Feature> getInformationByCoors(
+      LatLng coors, String country, String language) async {
+    final url = "$_basePlacesUrl/${coors.longitude},${coors.latitude}.json";
+
+    final response = await _dioPlaces.get(url, queryParameters: {
+      "limit": 1,
+      "country": country,
+      "language": language
+    });
+    final PlacesResponse placesResponse = PlacesResponse.fromMap(response.data);
+    return placesResponse.features.first;
   }
 }

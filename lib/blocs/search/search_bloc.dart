@@ -7,6 +7,7 @@ import 'package:google_polyline_algorithm/google_polyline_algorithm.dart';
 import 'package:gps_project/blocs/blocs.dart';
 import 'package:gps_project/models/models.dart';
 
+import '../../screens/loading_screen.dart' show country, language;
 import '../../services/services.dart';
 
 part 'search_event.dart';
@@ -46,6 +47,10 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
 
   Future<RouteDestination> getCoorsStartToEnd(LatLng start, LatLng end) async {
     final trafficResponse = await trafficService.getCoorsStartToEnd(start, end);
+
+    final endPlace =
+        await trafficService.getInformationByCoors(end, country, language);
+
     final distance = trafficResponse.routes[0].distance;
     final duration = trafficResponse.routes[0].duration;
     final geometry = trafficResponse.routes[0].geometry;
@@ -60,6 +65,7 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
       points: points,
       duration: duration,
       distance: distance,
+      endplace: endPlace,
     );
   }
 
@@ -70,17 +76,20 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     add(OnNewPlacesFoundEvent(response));
   }
 
-  void createCustomPlace(LatLng position) {
+  void createCustomPlace(LatLng position, RouteDestination destination) {
     Feature place = Feature(
-        id: "place.custom",
+        id: "${destination.endplace.id}",
         type: "Feature",
         placeType: ["place"],
-        text: "Manual location",
+        text: destination.endplace.text.toString(),
+        placeName: destination.endplace.placeName,
         properties:
-            Properties.fromMap({'accuracy':null,'override:postcode':null}),
+            Properties.fromMap({'accuracy': null, 'override:postcode': null}),
         center: [position.longitude, position.latitude],
-        geometry: Geometry.fromMap(
-            {'type':'Point','coordinates':[position.longitude,position.latitude]}),
+        geometry: Geometry.fromMap({
+          'type': 'Point',
+          'coordinates': [position.longitude, position.latitude]
+        }),
         context: []);
     add(AddToHistoryEvent(place));
   }

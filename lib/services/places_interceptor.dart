@@ -11,7 +11,6 @@ class PlacesInterceptor extends Interceptor {
       "geometries": "polyline6",
       "autocomplete": false,
       "routing": true,
-      "limit": 7,
       "access_token": accessToken
     });
     super.onRequest(options, handler);

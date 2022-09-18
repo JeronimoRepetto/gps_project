@@ -8,6 +8,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:gps_project/blocs/blocs.dart';
 import 'package:gps_project/models/models.dart';
 
+import '../../helpers/helpers.dart';
 import '../../themes/map_style.dart';
 
 part 'map_event.dart';
@@ -36,8 +37,8 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     on<OnToggleUserRute>(
         (event, emit) => emit(state.CopyWith(showMyRute: !state.showMyRute)));
 
-    on<OnNewPolylineEvent>(
-        (event, emit) => emit(state.CopyWith(polylines: event.polyline)));
+    on<OnNewPolylineEvent>((event, emit) => emit(
+        state.CopyWith(polylines: event.polyline, markers: event.markers)));
 
     locationStateSubscription = locationBloc.stream.listen((locationState) {
       if (locationState.lastKnowLocation == null) return;
@@ -94,10 +95,40 @@ class MapBloc extends Bloc<MapEvent, MapState> {
         endCap: Cap.roundCap,
         width: 3);
 
+    double kms = destination.distance / 1000;
+    kms = (kms * 100).floorToDouble();
+    kms /= 100;
+
+    double tripDuration = (destination.duration / 60).floorToDouble();
+
+    final startImgMarker =
+        await getStartCustomMarker(tripDuration.toInt(), "Current location");
+    final endImgMarker = await getEndCustomMarker(
+        kms.toInt(), destination.endplace.placeName.toString());
+
+    final startMarker = Marker(
+        icon: startImgMarker,
+        markerId: const MarkerId("start"),
+        position: destination.points.first,
+        anchor: const Offset(0, 0.9));
+
+    final endMarker = Marker(
+      icon: endImgMarker,
+      markerId: const MarkerId("end"),
+      position: destination.points.last,
+    );
+
+    final currentMarkers = Map<String, Marker>.from(state.markers);
+    currentMarkers["start"] = startMarker;
+    currentMarkers["end"] = endMarker;
+
     final currentPolyline = Map<String, Polyline>.from(state.polylines);
     currentPolyline["routeDestination"] = myDestination;
 
-    add(OnNewPolylineEvent(currentPolyline));
+    add(OnNewPolylineEvent(currentPolyline, currentMarkers));
+
+    await Future.delayed(const Duration(milliseconds: 300));
+    _mapController?.showMarkerInfoWindow(const MarkerId("end"));
   }
 
   @override
