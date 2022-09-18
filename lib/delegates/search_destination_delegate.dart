@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gps_project/models/models.dart';
 
 class SearchDestinationDelegate extends SearchDelegate<SearchResult> {
-  SearchDestinationDelegate() : super(searchFieldLabel: "Buscar...");
+  SearchDestinationDelegate() : super(searchFieldLabel: "Search...",);
   @override
   List<Widget>? buildActions(BuildContext context) {
     return [

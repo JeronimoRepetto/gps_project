@@ -6,6 +6,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:gps_project/blocs/blocs.dart';
+import 'package:gps_project/models/models.dart';
 
 import '../../themes/map_style.dart';
 
@@ -15,6 +16,7 @@ part 'map_state.dart';
 class MapBloc extends Bloc<MapEvent, MapState> {
   final LocationBloc locationBloc;
   GoogleMapController? _mapController;
+  LatLng? mapCenter;
 
   StreamSubscription<LocationState>? locationStateSubscription;
 
@@ -33,6 +35,9 @@ class MapBloc extends Bloc<MapEvent, MapState> {
 
     on<OnToggleUserRute>(
         (event, emit) => emit(state.CopyWith(showMyRute: !state.showMyRute)));
+
+    on<OnNewPolylineEvent>(
+        (event, emit) => emit(state.CopyWith(polylines: event.polyline)));
 
     locationStateSubscription = locationBloc.stream.listen((locationState) {
       if (locationState.lastKnowLocation == null) return;
@@ -63,7 +68,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
       UpdateUserPolylineEvent event, Emitter<MapState> emit) {
     final Polyline myRute = Polyline(
       polylineId: const PolylineId("myRoute"),
-      color: Colors.black,
+      color: Colors.black45,
       width: 3,
       startCap: Cap.roundCap,
       endCap: Cap.roundCap,
@@ -78,6 +83,21 @@ class MapBloc extends Bloc<MapEvent, MapState> {
   void moveCamera(LatLng newLocation) {
     final cameraUpdate = CameraUpdate.newLatLng(newLocation);
     _mapController?.animateCamera(cameraUpdate);
+  }
+
+  Future<void> drawRoutePolyline(RouteDestination destination) async {
+    final myDestination = Polyline(
+        polylineId: const PolylineId("routeDestination"),
+        color: Colors.black,
+        points: destination.points,
+        startCap: Cap.roundCap,
+        endCap: Cap.roundCap,
+        width: 3);
+
+    final currentPolyline = Map<String, Polyline>.from(state.polylines);
+    currentPolyline["routeDestination"] = myDestination;
+
+    add(OnNewPolylineEvent(currentPolyline));
   }
 
   @override

@@ -13,12 +13,19 @@ class OnMapInitializedEvent extends MapEvent {
 }
 
 class OnStopFollowing extends MapEvent {}
+
 class OnStartFollowing extends MapEvent {}
+
 class OnSwitchFollowing extends MapEvent {}
 
-class UpdateUserPolylineEvent extends MapEvent{
+class UpdateUserPolylineEvent extends MapEvent {
   final List<LatLng> userHistory;
   const UpdateUserPolylineEvent(this.userHistory);
 }
 
-class OnToggleUserRute extends MapEvent{}
+class OnNewPolylineEvent extends MapEvent {
+  final Map<String, Polyline> polyline;
+  const OnNewPolylineEvent(this.polyline);
+}
+
+class OnToggleUserRute extends MapEvent {}
