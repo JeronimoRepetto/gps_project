@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -29,6 +31,17 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
         state.CopyWith(places: event.places),
       ),
     );
+    on<AddToHistoryEvent>(
+      (event, emit) {
+        List<Feature> historyPlaces = [...state.historyPlaces];
+        historyPlaces.removeWhere((place) => place.id == event.place.id);
+        emit(
+          state.CopyWith(
+            historyPlaces: [event.place, ...historyPlaces],
+          ),
+        );
+      },
+    );
   }
 
   Future<RouteDestination> getCoorsStartToEnd(LatLng start, LatLng end) async {
@@ -55,5 +68,20 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     final response = await trafficService.getResultByQuery(
         proximity, query, country, language);
     add(OnNewPlacesFoundEvent(response));
+  }
+
+  void createCustomPlace(LatLng position) {
+    Feature place = Feature(
+        id: "place.custom",
+        type: "Feature",
+        placeType: ["place"],
+        text: "Manual location",
+        properties:
+            Properties.fromMap({'accuracy':null,'override:postcode':null}),
+        center: [position.longitude, position.latitude],
+        geometry: Geometry.fromMap(
+            {'type':'Point','coordinates':[position.longitude,position.latitude]}),
+        context: []);
+    add(AddToHistoryEvent(place));
   }
 }

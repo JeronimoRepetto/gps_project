@@ -1,10 +1,10 @@
-import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart' show LatLng;
 import 'package:gps_project/blocs/blocs.dart';
-import 'package:gps_project/helpers/helpers.dart';
 import 'package:gps_project/models/models.dart';
+
+import '../widgets/widgets.dart';
 
 class SearchDestinationDelegate extends SearchDelegate<SearchResult> {
   SearchDestinationDelegate()
@@ -38,59 +38,95 @@ class SearchDestinationDelegate extends SearchDelegate<SearchResult> {
   Widget buildResults(BuildContext context) {
     final locationBloc = BlocProvider.of<LocationBloc>(context);
     final searchBloc = BlocProvider.of<SearchBloc>(context);
-    final mapBloc = BlocProvider.of<MapBloc>(context);
     final proximity = locationBloc.state.lastKnowLocation!;
     final country = Localizations.localeOf(context).countryCode ?? "es";
     final language = Localizations.localeOf(context).languageCode;
     searchBloc.getPlacesByQuery(proximity, query, country, language);
     return BlocBuilder<SearchBloc, SearchState>(
       builder: (context, state) {
-        return ListView(
-          children: [
-            ...state.places
-                .map(
-                  (place) => FadeInLeft(
-                    child: ListTile(
-                      title: Text(
-                        place.placeName.toString(),
-                      ),
-                      onTap: () async {
-                        showLoadingMessage(context);
-                        final destination = await searchBloc.getCoorsStartToEnd(
-                          locationBloc.state.lastKnowLocation!,
-                          LatLng(
-                            place.geometry.coordinates[1].toDouble(),
-                            place.geometry.coordinates[0].toDouble(),
-                          ),
-                        );
-                        await mapBloc.drawRoutePolyline(destination);
-                        Navigator.popUntil(context, (route) => route.isFirst);
-                      },
-                    ),
-                  ),
-                )
-                .toList()
-          ],
-        );
+        final places = state.places;
+        return ListView.separated(
+            itemCount: places.length,
+            separatorBuilder: (context, i) => const Divider(),
+            itemBuilder: (context, i) {
+              final place = places[i];
+              return SearchTile(
+                title: place.text.toString(),
+                icon: Icons.place_outlined,
+                subtitle: place.placeName.toString(),
+                onTap: () {
+                  final position = LatLng(
+                    place.geometry.coordinates[1].toDouble(),
+                    place.geometry.coordinates[0].toDouble(),
+                  );
+                  /*
+                  For Google:
+                  final position = LatLng(
+                    place.geometry.coordinates[0].toDouble(),
+                    place.geometry.coordinates[1].toDouble(),
+                  );
+                   */
+                  searchBloc.add(AddToHistoryEvent(place));
+                  final result = SearchResult(
+                    cancel: false,
+                    manual: false,
+                    position: position,
+                    name: place.text,
+                    description: place.placeName,
+                  );
+                  close(context, result);
+                },
+              );
+            });
       },
     );
   }
 
   @override
   Widget buildSuggestions(BuildContext context) {
-    return ListView(
+    final searchBloc = BlocProvider.of<SearchBloc>(context);
+    final places = searchBloc.state.historyPlaces;
+    return Column(
       children: [
-        ListTile(
-          leading: const Icon(Icons.location_on_outlined, color: Colors.black),
-          title: const Text(
-            "Colocar la ubicacion manualmente",
-            style: TextStyle(color: Colors.black),
-          ),
+        SearchTile(
+          icon: Icons.location_on_outlined,
+          title: "Set the location manually",
           onTap: () {
             final result = SearchResult(cancel: false, manual: true);
             close(context, result);
           },
-        )
+        ),
+        const Divider(),
+        Expanded(
+          child: ListView.separated(
+            separatorBuilder: (context, i) => const Divider(),
+            itemCount: places.length,
+            itemBuilder: (context, i) {
+              final place = places[i];
+              return SearchTile(
+                title: place.text.toString(),
+                icon: Icons.history_outlined,
+                subtitle: place.placeName ??
+                    "${place.geometry.coordinates[0]},${place.geometry.coordinates[1]}",
+                onTap: () {
+                  final position = LatLng(
+                    place.geometry.coordinates[1].toDouble(),
+                    place.geometry.coordinates[0].toDouble(),
+                  );
+                  searchBloc.add(AddToHistoryEvent(place));
+                  final result = SearchResult(
+                    cancel: false,
+                    manual: false,
+                    position: position,
+                    name: place.text,
+                    description: place.placeName,
+                  );
+                  close(context, result);
+                },
+              );
+            },
+          ),
+        ),
       ],
     );
   }

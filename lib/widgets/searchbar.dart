@@ -5,6 +5,7 @@ import 'package:gps_project/delegates/delegates.dart';
 import 'package:gps_project/models/models.dart';
 
 import '../blocs/blocs.dart';
+import '../helpers/helpers.dart';
 
 class SearchBar extends StatelessWidget {
   const SearchBar({Key? key}) : super(key: key);
@@ -21,10 +22,22 @@ class SearchBar extends StatelessWidget {
 class _SearchBarBody extends StatelessWidget {
   const _SearchBarBody({Key? key}) : super(key: key);
 
-  void _onSearchResult(SearchResult searchResult, BuildContext context) {
+  Future<void> _onSearchResult(
+      SearchResult searchResult, BuildContext context) async {
     final searchBloc = BlocProvider.of<SearchBloc>(context);
+    final locationBloc = BlocProvider.of<LocationBloc>(context);
+    final mapBloc = BlocProvider.of<MapBloc>(context);
+
     if (searchResult.manual!) {
       searchBloc.add(OnActivateManualMarkerEvent());
+      return;
+    }
+    if (searchResult.position != null) {
+      showLoadingMessage(context);
+      final destination = await searchBloc.getCoorsStartToEnd(
+          locationBloc.state.lastKnowLocation!, searchResult.position!);
+      await mapBloc.drawRoutePolyline(destination);
+      Navigator.pop(context);
       return;
     }
   }

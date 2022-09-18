@@ -1,7 +1,10 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gps_project/blocs/blocs.dart';
+import 'package:gps_project/models/models.dart';
 
 import '../helpers/helpers.dart';
 
@@ -69,6 +72,7 @@ class _ManualMarkerBody extends StatelessWidget {
                   showLoadingMessage(context);
                   final destination = await searchBloc.getCoorsStartToEnd(start, end);
                   await mapBloc.drawRoutePolyline(destination);
+                  searchBloc.createCustomPlace(mapBloc.mapCenter!);
                   searchBloc.add(
                     OnDeactivateManualMarkerEvent(),
                   );
