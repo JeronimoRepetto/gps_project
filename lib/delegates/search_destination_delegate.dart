@@ -3,8 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart' show LatLng;
 import 'package:gps_project/blocs/blocs.dart';
 import 'package:gps_project/models/models.dart';
-
-import '../screens/loading_screen.dart'show country, language;
 import '../widgets/widgets.dart';
 
 class SearchDestinationDelegate extends SearchDelegate<SearchResult> {
@@ -40,7 +38,7 @@ class SearchDestinationDelegate extends SearchDelegate<SearchResult> {
     final locationBloc = BlocProvider.of<LocationBloc>(context);
     final searchBloc = BlocProvider.of<SearchBloc>(context);
     final proximity = locationBloc.state.lastKnowLocation!;
-    searchBloc.getPlacesByQuery(proximity, query, country, language);
+    searchBloc.getPlacesByQuery(proximity, query);
     return BlocBuilder<SearchBloc, SearchState>(
       builder: (context, state) {
         final places = state.places;
