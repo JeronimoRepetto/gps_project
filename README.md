@@ -1,6 +1,12 @@
 # gps_project
 
-A new Flutter project.
+##Technologies:
+- Flutter 3.0.5
+- Xcode 13.4.1
+- Android SDK version 33.0.0
+- GoogleMaps
+- Mapbox
+- Dio
 
 ## Getting Started
 
