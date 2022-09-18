@@ -1,6 +1,6 @@
 # gps_project
 
-##Technologies:
+## Technologies:
 - Flutter 3.0.5
 - Xcode 13.4.1
 - Android SDK version 33.0.0
