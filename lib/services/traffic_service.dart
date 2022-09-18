@@ -33,7 +33,7 @@ class TrafficService {
       "country" : country,
       "language" : language
     });
-    final PlacesResponse placesResponse = PlacesResponse.fromJson(response.data);
-    return placesResponse.features; //LUGARES
+    final PlacesResponse placesResponse = PlacesResponse.fromMap(response.data);
+    return placesResponse.features;
   }
 }

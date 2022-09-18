@@ -38,27 +38,27 @@ class PlacesResponse {
 
 class Feature {
   Feature({
-    required this.id,
-    required this.type,
+    this.id,
+    this.type,
     required this.placeType,
     required this.properties,
-    required this.textEs,
-    required this.placeNameEs,
-    required this.text,
-    required this.placeName,
+    this.textEs,
+    this.placeNameEs,
+    this.text,
+    this.placeName,
     required this.center,
     required this.geometry,
     required this.context,
   });
 
-  final String id;
-  final String type;
+  final String? id;
+  final String? type;
   final List<String> placeType;
   final Properties properties;
-  final String textEs;
-  final String placeNameEs;
-  final String text;
-  final String placeName;
+  final String? textEs;
+  final String? placeNameEs;
+  final String? text;
+  final String? placeName;
   final List<double> center;
   final Geometry geometry;
   final List<Context> context;
@@ -98,18 +98,18 @@ class Feature {
 
 class Context {
   Context({
-    required this.id,
-    required this.textEs,
-    required this.text,
+    this.id,
+    this.textEs,
+    this.text,
     this.wikidata,
     this.languageEs,
     this.language,
     this.shortCode,
   });
 
-  final String id;
-  final String textEs;
-  final String text;
+  final String? id;
+  final String? textEs;
+  final String? text;
   final String? wikidata;
   final Language? languageEs;
   final Language? language;
@@ -173,11 +173,11 @@ class Geometry {
 
 class Properties {
   Properties({
-   required this.accuracy,
+    this.accuracy,
     this.overridePostcode,
   });
 
-  final String accuracy;
+  final String? accuracy;
   final String? overridePostcode;
 
   factory Properties.fromJson(String str) => Properties.fromMap(json.decode(str));
